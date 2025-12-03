@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ESP32 Projects Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #111111;
+      --card: #f3f4f6;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+    }
+    .dark {
+      --bg: #020617;
+      --text: #e5e7eb;
+      --card: #0f172a;
+      --accent: #38bdf8;
+      --accent-soft: #0b1120;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.25s, color 0.25s;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+    }
+    .nav {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .nav-left {
+      font-weight: 700;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: radial-gradient(circle, #22d3ee, #0ea5e9);
+      box-shadow: 0 0 10px #0ea5e9;
+    }
+    .nav-center {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      font-size: 0.9rem;
+    }
+    .nav-link {
+      padding: 6px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      color: #cbd5f5;
+      border: 1px solid transparent;
+      transition: 0.2s;
+    }
+    .nav-link:hover {
+      background: rgba(148, 163, 184, 0.25);
+    }
+    .nav-link.active {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.15);
+      color: #e0f2fe;
+    }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .search-input {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.8);
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      min-width: 170px;
+      outline: none;
+    }
+    .search-input::placeholder { color: #64748b; }
+    .theme-btn {
+      border-radius: 999px;
+      padding: 6px 10px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 18px 16px 32px;
+    }
+    section { display: none; }
+    section.active { display: block; }
+
+    /* HOME (simple, commercial style) */
+    #home {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding-top: 30px;
+      padding-bottom: 40px;
+    }
+    .hero-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .hero-sub {
+      font-size: 0.95rem;
+      color: #9ca3af;
+      margin-bottom: 20px;
+    }
+    .yt-card {
+      background: linear-gradient(135deg, #0f172a, #020617);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      border-radius: 18px;
+      padding: 16px 16px 14px;
+      color: #e5e7eb;
+      max-width: 320px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+    }
+    .yt-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .yt-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      background: radial-gradient(circle, #facc15, #f97316);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 0 18px rgba(248, 250, 252, 0.4);
+    }
+    .yt-btn {
+      margin-top: 10px;
+      border-radius: 999px;
+      padding: 7px 12px;
+      border: none;
+      background: #f97316;
+      color: #111827;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* Projects list */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 12px;
+    }
+    .section-header h2 { font-size: 1.1rem; }
+    .section-header span { font-size: 0.8rem; color: #6b7280; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: 0.18s;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.25);
+      border-color: var(--accent);
+    }
+    .card-img {
+      width: 100%;
+      height: 140px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: #020617;
+    }
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    .card-desc {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+    .card-footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+    .small-btn {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+      cursor: pointer;
+    }
+    .empty {
+      text-align: center;
+      padding: 30px 10px;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+
+    /* Detail page */
+    #detail {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    #detail img {
+      width: 100%;
+      border-radius: 14px;
+      margin: 10px 0;
+      object-fit: cover;
+    }
+    #detail p { font-size: 0.9rem; line-height: 1.4; color: #6b7280; }
+    .detail-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <div class="nav-left">
+        <div class="nav-dot"></div>
+        <span>ESP32 Projects Hub</span>
+      </div>
+
+      <div class="nav-center">
+        <span class="nav-link active" data-section="home">Home</span>
+        <span class="nav-link" data-section="projects">Projects</span>
+        <span class="nav-link" data-section="searchPage">Search</span>
+      </div>
+
+      <div class="nav-right">
+        <input id="searchInput" class="search-input" placeholder="Search projects..." />
+        <button id="themeToggle" class="theme-btn">🌙/☀️</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section id="home" class="active">
+      <div class="hero-title">ESP32 & Embedded Project Library</div>
+      <div class="hero-sub">Commercial grade, real hardware projects with code and documentation.</div>
+
+      <div class="yt-card">
+        <div class="yt-top">
+          <div class="yt-logo">📺</div>
+          <div>
+            <div style="font-weight:600;">MaWa Embedded TV</div>
+            <div style="font-size:0.8rem;color:#9ca3af;">ESP32 · GSM · IoT · Real Life Builds</div>
+          </div>
+        </div>
+        <div style="font-size:0.8rem;color:#9ca3af;">
+          Watch full build videos, wiring, and live debugging sessions.
+        </div>
+        <button class="yt-btn" onclick="openChannel()">Open Channel</button>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects">
+      <div class="section-header">
+        <h2>All Projects</h2>
+        <span id="projectCountText">Loading...</span>
+      </div>
+      <div id="projectsGrid" class="grid"></div>
+    </section>
+
+    <!-- SEARCH PAGE -->
+    <section id="searchPage">
+      <div class="section-header">
+        <h2>Search Results</h2>
+        <span id="searchInfo"></span>
+      </div>
+      <div id="searchGrid" class="grid"></div>
+    </section>
+
+    <!-- DETAIL PAGE -->
+    <section id="detail">
+      <button class="small-btn" onclick="goBackToProjects()">⬅ Back to projects</button>
+      <h2 id="detailTitle" style="margin-top:10px;"></h2>
+      <img id="detailImg" alt="Project image" />
+      <p id="detailDesc"></p>
+      <div class="detail-actions">
+        <button class="small-btn" id="detailDownloadBtn" disabled>Download Code</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    // ================= THEME =================
+    function applyTheme(mode) {
+      document.body.classList.toggle("dark", mode === "dark");
+      localStorage.setItem("themeMode", mode);
+    }
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const saved = localStorage.getItem("themeMode") || (prefersDark ? "dark" : "light");
+    applyTheme(saved);
+
+    document.getElementById("themeToggle").addEventListener("click", () => {
+      const nowDark = !document.body.classList.contains("dark");
+      applyTheme(nowDark ? "dark" : "light");
+    });
+
+    // ================ NAVIGATION =================
+    const sections = ["home", "projects", "searchPage", "detail"];
+    function showSection(id) {
+      sections.forEach((sec) => {
+        const el = document.getElementById(sec);
+        if (!el) return;
+        el.classList.toggle("active", sec === id);
+      });
+      document
+        .querySelectorAll(".nav-link")
+        .forEach((el) => el.classList.toggle("active", el.dataset.section === id));
+      gsap.from("#" + id, { opacity: 0, y: 10, duration: 0.3 });
+    }
+
+    document.querySelectorAll(".nav-link").forEach((el) => {
+      el.addEventListener("click", () => {
+        const sec = el.dataset.section;
+        showSection(sec);
+        if (sec === "projects") renderProjectsList();
+      });
+    });
+
+    function openChannel() {
+      window.open("https://youtube.com", "_blank");
+    }
+
+    function goBackToProjects() {
+      showSection("projects");
+    }
+
+    // ================ FIREBASE SETUP =================
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      query,
+      orderBy,
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      // TODO: paste your Firebase config here
+      // apiKey: "YOUR_API_KEY",
+      // authDomain: "YOUR_AUTH_DOMAIN",
+      // projectId: "YOUR_PROJECT_ID",
+      // storageBucket: "YOUR_STORAGE_BUCKET",
+      // messagingSenderId: "YOUR_SENDER_ID",
+      // appId: "YOUR_APP_ID",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const projectsCol = collection(db, "projects");
+    let allProjects = []; // local cache
+
+    async function fetchProjects() {
+      try {
+        const q = query(projectsCol, orderBy("createdAt", "desc"));
+        const snap = await getDocs(q);
+        allProjects = [];
+        snap.forEach((doc) => {
+          allProjects.push({ id: doc.id, ...doc.data() });
+        });
+        renderProjectsList();
+      } catch (err) {
+        console.error(err);
+        document.getElementById("projectsGrid").innerHTML =
+          '<div class="empty">Error loading projects. Check Firebase config.</div>';
+      }
+    }
+
+    // ================ RENDER PROJECTS =================
+    function createProjectCard(project) {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.onclick = () => openProjectDetail(project.id);
+
+      const img = document.createElement("img");
+      img.className = "card-img";
+      img.src = project.imageURL || "";
+      img.alt = project.title || "Project image";
+
+      const title = document.createElement("div");
+      title.className = "card-title";
+      title.textContent = project.title || "Untitled Project";
+
+      const desc = document.createElement("div");
+      desc.className = "card-desc";
+      const dText = project.description || "";
+      desc.textContent = dText.length > 110 ? dText.slice(0, 110) + "..." : dText;
+
+      const footer = document.createElement("div");
+      footer.className = "card-footer";
+      const btn = document.createElement("button");
+      btn.className = "small-btn";
+      btn.textContent = "View";
+      footer.appendChild(btn);
+
+      card.appendChild(img);
+      card.appendChild(title);
+      card.appendChild(desc);
+      card.appendChild(footer);
+
+      return card;
+    }
+
+    function renderProjectsList() {
+      const grid = document.getElementById("projectsGrid");
+      const info = document.getElementById("projectCountText");
+
+      if (!allProjects.length) {
+        grid.innerHTML = '<div class="empty">No projects uploaded yet.</div>';
+        info.textContent = "0 project";
+        return;
+      }
+
+      grid.innerHTML = "";
+      allProjects.forEach((p) => {
+        const card = createProjectCard(p);
+        grid.appendChild(card);
+        gsap.from(card, { opacity: 0, y: 10, duration: 0.25 });
+      });
+      info.textContent = `${allProjects.length} project(s)`;
+    }
+
+    // ================ DETAIL VIEW =================
+    function openProjectDetail(id) {
+      const project = allProjects.find((p) => p.id === id);
+      if (!project) return;
+
+      document.getElementById("detailTitle").textContent =
+        project.title || "Untitled Project";
+      document.getElementById("detailImg").src = project.imageURL || "";
+      document.getElementById("detailDesc").textContent =
+        project.description || "";
+
+      const downloadBtn = document.getElementById("detailDownloadBtn");
+      if (project.codeURL) {
+        downloadBtn.disabled = false;
+        downloadBtn.onclick = () => window.open(project.codeURL, "_blank");
+      } else {
+        downloadBtn.disabled = true;
+        downloadBtn.onclick = null;
+      }
+
+      showSection("detail");
+    }
+
+    // ================ SEARCH =================
+    const searchInput = document.getElementById("searchInput");
+    const searchGrid = document.getElementById("searchGrid");
+    const searchInfo = document.getElementById("searchInfo");
+
+    function renderSearchResults(queryText) {
+      const q = queryText.trim().toLowerCase();
+      if (!q) {
+        searchGrid.innerHTML =
+          '<div class="empty">Type something to search by title or tags.</div>';
+        searchInfo.textContent = "";
+        return;
+      }
+
+      const results = allProjects.filter((p) => {
+        const t = (p.title || "").toLowerCase();
+        const d = (p.description || "").toLowerCase();
+        const tags = Array.isArray(p.tags) ? p.tags.join(" ").toLowerCase() : "";
+        return t.includes(q) || d.includes(q) || tags.includes(q);
+      });
+
+      searchInfo.textContent = `${results.length} result(s) for "${q}"`;
+
+      if (!results.length) {
+        searchGrid.innerHTML =
+          '<div class="empty">No projects matched your search.</div>';
+        return;
+      }
+
+      searchGrid.innerHTML = "";
+      results.forEach((p) => {
+        const card = createProjectCard(p);
+        card.onclick = () => openProjectDetail(p.id);
+        searchGrid.appendChild(card);
+        gsap.from(card, { opacity: 0, y: 10, duration: 0.25 });
+      });
+    }
+
+    searchInput.addEventListener("input", (e) => {
+      const value = e.target.value;
+      showSection("searchPage");
+      renderSearchResults(value);
+    });
+
+    // INITIAL
+    fetchProjects();
+  </script>
+</body>
+</html>
